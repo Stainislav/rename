@@ -35,7 +35,7 @@ async function downloadPhotos(client, query, photosNumber){
 
 console.log('Downloading has started...');
 downloadPhotos(client, query, photosNumber).then(() => {
-    console.log('Renaming is done. Check your files folder.');
+    console.log('Downloading is done. Check your files folder.');
 });
 
 
