@@ -1,29 +1,41 @@
 const fs = require('fs');
-const { readdir } = require('fs/promises');
-const { rename } = require('fs/promises');
-let { specialCharacters } = require('./specialCharacters.js');
+const https = require('https');
+const { createClient } = require('pexels');
 
-async function addSpecialCharactersToFileNames(directoryPath) {
-    try {
-        const filesArray = await readdir(directoryPath);
-        filesArray.forEach((fileName, index) => {
-            if (specialCharacters[index] === undefined) return;
+const dotenv = require('dotenv');
+dotenv.config();
 
-            const splittedFileName = fileName.split('.');
-            const fileNameWithoutExtension = splittedFileName[0];
-            const fileExtension = splittedFileName[1];
-
-            const oldPath = directoryPath + '/' + fileName;
-            const newPath = directoryPath + '/' + fileNameWithoutExtension + specialCharacters[index] + '.' + fileExtension;
-            rename(oldPath, newPath);
-        });
-      } catch (err) {
-        console.error(err);
-      }
-}
+const API_KEY = process.env.API_KEY;
+const client = createClient(API_KEY);
 
 const dirPath = 'files';
+const query = 'Nature';
+const photosNumber = 3;
 
-addSpecialCharactersToFileNames(dirPath).then(() => {
-    console.log('Renaming is done. Check your files folder');
+async function downloadPhotos(client, query, photosNumber){
+    try {
+        const photos = await client.photos.search({ query, per_page: photosNumber });
+        const photosArray = photos.photos;
+
+        for (const photo of photosArray) {
+
+            const url = photo.src.original;
+            const stringArray = url.split('/');
+            const fileName = stringArray[stringArray.length - 1];
+
+            await https.get(url, function(response) {
+                let file = fs.createWriteStream(dirPath + '/' + fileName);
+                response.pipe(file);
+            });
+        }
+    } catch (err) {
+        console.error(`The next error has happened during the downloading: ${err}`);
+    }
+}
+
+console.log('Downloading has started...');
+downloadPhotos(client, query, photosNumber).then(() => {
+    console.log('Renaming is done. Check your files folder.');
 });
+
+
