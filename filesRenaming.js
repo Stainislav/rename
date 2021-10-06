@@ -1,11 +1,12 @@
-const fs = require('fs');
 const { readdir } = require('fs/promises');
 const { rename } = require('fs/promises');
-let { specialCharacters } = require('./specialCharacters.js');
+const { specialCharacters } = require('./specialCharacters.js');
+const dirPath = 'files';
 
 async function addSpecialCharactersToFileNames(directoryPath) {
     try {
         const filesArray = await readdir(directoryPath);
+
         filesArray.forEach((fileName, index) => {
             if (specialCharacters[index] === undefined) return;
 
@@ -18,12 +19,11 @@ async function addSpecialCharactersToFileNames(directoryPath) {
             rename(oldPath, newPath);
         });
     } catch (err) {
-        console.error(err);
+        console.error(`The next error has happened during the renaming: ${err}`);
     }
 }
 
-const dirPath = 'files';
-
+console.log('Renaming has started...');
 addSpecialCharactersToFileNames(dirPath).then(() => {
     console.log('Renaming is done. Check your files folder');
 });
