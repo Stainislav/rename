@@ -1,41 +1,46 @@
-const fs = require('fs');
-const https = require('https');
-const { createClient } = require('pexels');
+import fs from 'fs';
+import https from 'https';
+import { createClient } from 'pexels';
 
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config();
 
 const API_KEY = process.env.API_KEY;
 const client = createClient(API_KEY);
 
-const dirPath = 'files';
+const dirPath = 'videos';
 const query = 'Nature';
-const photosNumber = 80;
+const videosNumber = 2;
 
-async function downloadPhotos(client, query, photosNumber){
+async function downloadVideos(client, query, videosNumber){
     try {
-        const photos = await client.photos.search({ query, per_page: photosNumber });
-        const photosArray = photos.photos;
+        const videos = await client.videos.search({ query, per_page: videosNumber });
+        const videosArray = videos.videos;
 
-        for (const photo of photosArray) {
+        for (const video of videosArray) {
+            const url = video.video_files[0].link;
 
-            const url = photo.src.original;
-            const stringArray = url.split('/');
-            const fileName = stringArray[stringArray.length - 1];
+            https.get(url, function(response) {
 
-            await https.get(url, function(response) {
-                let file = fs.createWriteStream(dirPath + '/' + fileName);
-                response.pipe(file);
+                const urlOfVideo = response.headers.location;
+                const stringArray = urlOfVideo.split('filename=');
+                const fileName = stringArray[stringArray.length - 1];
+
+                https.get(urlOfVideo, function(response) {
+                    const file = fs.createWriteStream(dirPath + '/' + fileName);
+                    response.pipe(file);
+                });
             });
         }
     } catch (err) {
-        console.error(`The next error has happened during the downloading: ${err}`);
+        console.error(`The next error has happened during a video downloading: ${err}`);
     }
+
 }
 
 console.log('Downloading has started...');
-downloadPhotos(client, query, photosNumber).then(() => {
-    console.log('Downloading is done. Check your files folder.');
+downloadVideos(client, query, videosNumber).then(() => {
+    console.log('Downloading is done. Check your videos folder.');
 });
 
 
