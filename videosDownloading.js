@@ -1,18 +1,8 @@
-import fs from 'fs';
 import https from 'https';
-import { createClient } from 'pexels';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
-const API_KEY = process.env.API_KEY;
-const client = createClient(API_KEY);
-
-const dirPath = 'videos';
-const query = 'Nature';
-const videosNumber = 2;
-
-async function downloadVideos(client, query, videosNumber){
+async function downloadVideos(client, query, dirPath, videosNumber){
     try {
         const videos = await client.videos.search({ query, per_page: videosNumber });
         const videosArray = videos.videos;
@@ -26,8 +16,11 @@ async function downloadVideos(client, query, videosNumber){
                 const stringArray = urlOfVideo.split('filename=');
                 const fileName = stringArray[stringArray.length - 1];
 
+                const fileNameArray = fileName.split('.mp4');
+                const fileNameWithoutExtension = fileNameArray[0];
+
                 https.get(urlOfVideo, function(response) {
-                    const file = fs.createWriteStream(dirPath + '/' + fileName);
+                    const file = fs.createWriteStream(dirPath + '/' + fileNameWithoutExtension + uuidv4() + '.mp4');
                     response.pipe(file);
                 });
             });
@@ -35,12 +28,6 @@ async function downloadVideos(client, query, videosNumber){
     } catch (err) {
         console.error(`The next error has happened during a video downloading: ${err}`);
     }
-
 }
 
-console.log('Downloading has started...');
-downloadVideos(client, query, videosNumber).then(() => {
-    console.log('Downloading is done. Check your videos folder.');
-});
-
-
+export { downloadVideos };

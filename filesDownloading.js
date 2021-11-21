@@ -1,41 +1,41 @@
-const fs = require('fs');
-const https = require('https');
-const { createClient } = require('pexels');
+import { createClient } from 'pexels';
+import { downloadPhotos } from './photosDownloading.js';
+import { downloadVideos } from './videosDownloading.js';
+import { addSpecialCharactersToFileNames } from './filesRenaming.js';
 
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config();
 
 const API_KEY = process.env.API_KEY;
 const client = createClient(API_KEY);
 
-const dirPath = 'files';
+const photosDirPath = 'photos';
+const videosDirPath = 'videos';
 const query = 'Nature';
-const photosNumber = 3;
+const photosNumber = 4;
+const videosNumber = 4;
 
-async function downloadPhotos(client, query, photosNumber){
-    try {
-        const photos = await client.photos.search({ query, per_page: photosNumber });
-        const photosArray = photos.photos;
+console.log('Photos downloading has started.');
 
-        for (const photo of photosArray) {
-
-            const url = photo.src.original;
-            const stringArray = url.split('/');
-            const fileName = stringArray[stringArray.length - 1];
-
-            await https.get(url, function(response) {
-                let file = fs.createWriteStream(dirPath + '/' + fileName);
-                response.pipe(file);
-            });
-        }
-    } catch (err) {
-        console.error(`The next error has happened during the downloading: ${err}`);
-    }
-}
-
-console.log('Downloading has started...');
-downloadPhotos(client, query, photosNumber).then(() => {
-    console.log('Downloading is done. Check your files folder.');
+downloadPhotos(client, query, photosDirPath, photosNumber).then(() => {
+    setTimeout(() => {
+        console.log('Photos renaming has started.');
+        addSpecialCharactersToFileNames(photosDirPath).then(() => {
+            console.log('Photos renaming is done.');
+        });
+    }, 10000);
+    console.log('Photos downloading is done.');
 });
 
+console.log('Videos downloading has started.');
+
+downloadVideos(client, query, videosDirPath, videosNumber).then(() => {
+    setTimeout(() => {
+        console.log('Videos renaming has started.');
+        addSpecialCharactersToFileNames(videosDirPath).then(() => {
+            console.log('Videos renaming is done.');
+        });
+    }, 20000);
+    console.log('Videos downloading is done.');
+});
 

@@ -1,4 +1,4 @@
-exports.specialCharacters = [
+const specialCharacters = [
     "!",
     "'",
     "#",
@@ -27,4 +27,6 @@ exports.specialCharacters = [
     "|",
     "}",
     "~"
-]
+];
+
+export { specialCharacters };

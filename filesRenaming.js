@@ -1,7 +1,6 @@
-const { readdir } = require('fs/promises');
-const { rename } = require('fs/promises');
-const { specialCharacters } = require('./specialCharacters.js');
-const dirPath = 'files';
+import { readdir } from 'fs/promises';
+import { rename } from 'fs/promises';
+import { specialCharacters } from './specialCharacters.js';
 
 async function addSpecialCharactersToFileNames(directoryPath) {
     try {
@@ -10,20 +9,19 @@ async function addSpecialCharactersToFileNames(directoryPath) {
         filesArray.forEach((fileName, index) => {
             if (specialCharacters[index] === undefined) return;
 
-            const splittedFileName = fileName.split('.');
-            const fileNameWithoutExtension = splittedFileName[0];
-            const fileExtension = splittedFileName[1];
+            if (fileName !== '.DS_Store') {
+                const splittedFileName = fileName.split('.');
+                const fileNameWithoutExtension = splittedFileName[0];
+                const fileExtension = splittedFileName[1];
 
-            const oldPath = directoryPath + '/' + fileName;
-            const newPath = directoryPath + '/' + fileNameWithoutExtension + specialCharacters[index] + '.' + fileExtension;
-            rename(oldPath, newPath);
+                const oldPath = directoryPath + '/' + fileName;
+                const newPath = directoryPath + '/' + fileNameWithoutExtension + specialCharacters[index] + '.' + fileExtension;
+                rename(oldPath, newPath);
+            }
         });
     } catch (err) {
-        console.error(`The next error has happened during the renaming: ${err}`);
+        console.error(`The next error has happened during the files renaming: ${err}`);
     }
 }
 
-console.log('Renaming has started...');
-addSpecialCharactersToFileNames(dirPath).then(() => {
-    console.log('Renaming is done. Check your files folder');
-});
+export { addSpecialCharactersToFileNames };
