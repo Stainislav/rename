@@ -14,15 +14,13 @@ const query = 'Nature';
 const photosNumber = 4;
 const videosNumber = 4;
 
-console.log('Photos downloading has started.');
+console.log('Photos downloading has started...');
+await downloadPhotos(client, query, photosDirPath, photosNumber);
+console.log('Photos downloading is done.');
 
-downloadPhotos(client, query, photosDirPath, photosNumber).then(() => {
-    console.log('Photos downloading is done.');
-});
 
-console.log('Videos downloading has started.');
+console.log('Videos downloading has started...');
+await downloadVideos(client, query, videosDirPath, videosNumber);
+console.log('Videos downloading is done.');
 
-downloadVideos(client, query, videosDirPath, videosNumber).then(() => {
-    console.log('Videos downloading is done.');
-});
 
