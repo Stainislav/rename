@@ -19,7 +19,7 @@ await downloadPhotos(client, query, photosDirPath, photosNumber);
 console.log('Photos downloading is done.');
 
 
-console.log('Videos downloading has started...');
+console.log('Downloading has started...');
 await downloadVideos(client, query, videosDirPath, videosNumber);
 console.log('Videos downloading is done.');
 
