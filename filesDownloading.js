@@ -1,7 +1,6 @@
 import { createClient } from 'pexels';
 import { downloadPhotos } from './photosDownloading.js';
 import { downloadVideos } from './videosDownloading.js';
-import { addSpecialCharactersToFileNames } from './filesRenaming.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -15,27 +14,13 @@ const query = 'Nature';
 const photosNumber = 4;
 const videosNumber = 4;
 
-console.log('Photos downloading has started.');
+console.log('Photos downloading has started...');
+await downloadPhotos(client, query, photosDirPath, photosNumber);
+console.log('Photos downloading is done.');
 
-downloadPhotos(client, query, photosDirPath, photosNumber).then(() => {
-    setTimeout(() => {
-        console.log('Photos renaming has started.');
-        addSpecialCharactersToFileNames(photosDirPath).then(() => {
-            console.log('Photos renaming is done.');
-        });
-    }, 10000);
-    console.log('Photos downloading is done.');
-});
 
-console.log('Videos downloading has started.');
+console.log('Downloading has started...');
+await downloadVideos(client, query, videosDirPath, videosNumber);
+console.log('Videos downloading is done.');
 
-downloadVideos(client, query, videosDirPath, videosNumber).then(() => {
-    setTimeout(() => {
-        console.log('Videos renaming has started.');
-        addSpecialCharactersToFileNames(videosDirPath).then(() => {
-            console.log('Videos renaming is done.');
-        });
-    }, 20000);
-    console.log('Videos downloading is done.');
-});
 
